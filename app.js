@@ -1,6 +1,9 @@
 const express = require("express");
-
 const app = express();
+
+// #### Importing Errors ####
+const errorHandler = require("./middleware/errorhandler.middleware");
+const { NotFound } = require("./errors/Errors.error");
 
 app.get("/", (req, res) => {
   res.send("hi there, im here");
@@ -14,5 +17,11 @@ app.get("/status", (req, res) => {
     timestamp: new Date().toString(),
   });
 });
+
+app.use((req, res, next) => {
+  throw new NotFound();
+});
+
+app.use(errorHandler);
 
 module.exports = app;
