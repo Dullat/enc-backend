@@ -1,5 +1,6 @@
 const userModel = require("../models/user.model.js");
 const refreshTokenModel = require("../models/refreshToken.model.js");
+const sendEmail = require("../utility/sendEmail.js");
 const { genAccessToken, genRefreshToken } = require("../utility/getToken.js");
 const {
   BadRequest,
@@ -25,7 +26,14 @@ const registerUser = async (req, res, next) => {
     const alreadyExist = await userModel.findOne({ email });
     if (alreadyExist) throw new Conflict("This email is already in use");
 
-    const user = await userModel.create({ name, email, password });
+    const verificationToken = crypto.randomBytes(40).toString("hex");
+
+    const user = await userModel.create({
+      name,
+      email,
+      password,
+      verificationToken,
+    });
     const accessToken = genAccessToken({ _id: user._id, email: user.email });
     const refreshToken = genRefreshToken({ _id: user._id, email: user.email });
 
@@ -40,6 +48,16 @@ const registerUser = async (req, res, next) => {
       userAgent: req.headers["user-agent"],
       ip: req.ip,
       expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
+    });
+
+    const verifyUrl = `http://localhost:5000/api/auth/verify-email?token=${verificationToken}&email=${email}`;
+
+    await sendEmail({
+      email: user.email,
+      subject: `Verify your Enc Account`,
+      html: `<h1>Welcome ${user.name}</h1>
+             <p>Please click the link below to verify your email:</p>
+             <a href="${verifyUrl}">Verify Email</a>`,
     });
 
     res.cookie("accessToken", accessToken, {
