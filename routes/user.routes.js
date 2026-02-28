@@ -5,6 +5,7 @@ const router = express.Router();
 const {
   registerUser,
   loginUser,
+  logoutUser,
 } = require("../controllers/auth.controller.js");
 
 const { verifyEmail } = require("../controllers/user.controller.js");
@@ -13,6 +14,7 @@ const { verifyEmail } = require("../controllers/user.controller.js");
 
 router.route("/api/auth/register").post(registerUser);
 router.route("/api/auth/login").post(loginUser);
-router.route("/api/verify-email").post(verifyEmail);
+router.route("/api/auth/verify-email").post(verifyEmail);
+router.route("/api/auth/logout").post(logoutUser);
 
 module.exports = router;

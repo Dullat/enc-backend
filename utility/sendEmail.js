@@ -19,4 +19,15 @@ const sendEmail = async ({ email, subject, html }) => {
   });
 };
 
-module.exports = sendEmail;
+const sendVerifiactionEmail = async (verificationToken, email, username) => {
+  const verifyUrl = `http://localhost:5000/api/auth/verify-email?token=${verificationToken}&email=${email}`;
+  await sendEmail({
+    email: email,
+    subject: `Verify your Enc Account`,
+    html: `<h1>Welcome ${username}</h1>
+             <p>Please click the link below to verify your email:</p>
+             <a href="${verifyUrl}">Verify Email</a>`,
+  });
+};
+
+module.exports = sendVerifiactionEmail;
