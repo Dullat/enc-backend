@@ -225,8 +225,50 @@ const verifyEmail = async (req, res, next) => {
   }
 };
 
+const reGenEmailVerificationUrl = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    if (!email) throw new BadRequest("Please provide an email");
+
+    const user = await userModel.findOne({ email });
+
+    if (!user) throw new NotFound("User does not exist");
+    if (user.isEmailVerified) throw new Conflict("Email is already verified");
+
+    const rawVerificationToken = crypto.randomBytes(40).toString("hex");
+    const hashedVerificationToken = crypto
+      .createHash("sha256")
+      .update(rawVerificationToken)
+      .digest("hex");
+
+    await userModel.findOneAndUpdate(
+      { email },
+      { verificationToken: hashedVerificationToken },
+    );
+
+    try {
+      await sendVerificationEmail(
+        rawVerificationToken,
+        user.email,
+        user.username,
+      );
+    } catch (emailError) {
+      throw new InternalServer("Failed to send verification link");
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "New verification link is sent to your email",
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
   logoutUser,
+  verifyEmail,
+  reGenEmailVerificationUrl,
 };
