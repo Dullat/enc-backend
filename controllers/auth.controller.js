@@ -11,6 +11,7 @@ const {
 } = require("../errors/Errors.error.js");
 
 const crypto = require("crypto");
+const jwt = require("jsonwebtoken");
 
 const registerUser = async (req, res, next) => {
   try {
@@ -171,13 +172,82 @@ const logoutUser = async (req, res, next) => {
       httpOnly: true,
       secure: true,
       sameSite: "none",
-      path: "api/auth",
+      path: "/api/auth",
     });
 
     res.status(200).json({
       success: true,
       message: "Logged-out successfully",
     });
+  } catch (err) {
+    next(err);
+  }
+};
+
+const refreshAccessToken = async (req, res, next) => {
+  try {
+    const rawRefreshToken = req.cookies.refreshToken;
+
+    if (!rawRefreshToken) throw new Unauthorized();
+
+    let decoded;
+    try {
+      decoded = jwt.verify(rawRefreshToken, process.env.JWT_REFRESH_SECRET);
+    } catch (err) {
+      throw new Unauthorized("Expired or invalid token");
+    }
+
+    const oldHashedToken = crypto
+      .createHash("sha256")
+      .update(rawRefreshToken)
+      .digest("hex");
+
+    const existingToken = await refreshTokenModel.findOne({
+      refreshToken: oldHashedToken,
+    });
+
+    if (!existingToken) throw new Unauthorized("Expired token");
+
+    const newRefreshToken = genRefreshToken({
+      _id: decoded._id,
+      email: decoded.email,
+    });
+
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(newRefreshToken)
+      .digest("hex");
+
+    const dbToken = await refreshTokenModel.findOneAndUpdate(
+      { _id: existingToken._id },
+      {
+        lastUsed: Date.now(),
+        expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
+        refreshToken: hashedToken,
+      },
+    );
+
+    const accessToken = genAccessToken({
+      _id: decoded._id,
+      email: decoded.email,
+    });
+
+    res.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      maxAge: 1000 * 60 * 5,
+    });
+
+    res.cookie("refreshToken", newRefreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      path: "/api/auth",
+      maxAge: 1000 * 60 * 60 * 24 * 7,
+    });
+
+    res.status(200).json({ sucess: true, message: "Token refreshed" });
   } catch (err) {
     next(err);
   }
@@ -271,4 +341,5 @@ module.exports = {
   logoutUser,
   verifyEmail,
   reGenEmailVerificationUrl,
+  refreshAccessToken,
 };
