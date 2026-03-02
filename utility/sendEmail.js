@@ -30,4 +30,15 @@ const sendVerifiactionEmail = async (verificationToken, email, username) => {
   });
 };
 
-module.exports = sendVerifiactionEmail;
+const sendResetEmail = async (resetToken, email, username) => {
+  const resetUrl = `http://localhost:5000/api/auth/reset-password?token=${resetToken}&email=${email}`;
+  await sendEmail({
+    email: email,
+    subject: `Reset your Enc password`,
+    html: `<h1>Reset your password ${username}</h1>
+          <p>Please click the link below to reset your password</p>
+          <a href="${resetUrl}">Reset_Password</a>`,
+  });
+};
+
+module.exports = { sendVerifiactionEmail, sendResetEmail };

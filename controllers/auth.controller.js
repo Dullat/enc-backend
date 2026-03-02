@@ -1,6 +1,9 @@
 const userModel = require("../models/user.model.js");
 const refreshTokenModel = require("../models/refreshToken.model.js");
-const sendVerificationEmail = require("../utility/sendEmail.js");
+const {
+  sendVerificationEmail,
+  sendResetEmail,
+} = require("../utility/sendEmail.js");
 const { genAccessToken, genRefreshToken } = require("../utility/getToken.js");
 const {
   BadRequest,
@@ -295,7 +298,7 @@ const verifyEmail = async (req, res, next) => {
   }
 };
 
-const reGenEmailVerificationUrl = async (req, res, next) => {
+const resendVerificationEmail = async (req, res, next) => {
   try {
     const { email } = req.body;
     if (!email) throw new BadRequest("Please provide an email");
@@ -335,11 +338,51 @@ const reGenEmailVerificationUrl = async (req, res, next) => {
   }
 };
 
+const requestPasswordReset = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) throw new BadRequest("No email provided");
+
+    const user = await userModel.findOne({ email });
+
+    if (!user) {
+      return res.status(200).json({
+        success: true,
+        message: "If account with this email exist, a reset link has been sent",
+      });
+    }
+    const rawResetToken = crypto.randomBytes(40).toString("hex");
+    const hashedResetToken = crypto
+      .createHash("sha256")
+      .update(rawResetToken)
+      .digest("hex");
+
+    user.passwordResetToken = hashedResetToken;
+    user.passwordResetExpires = new Date(Date.now() + 1000 * 60 * 15);
+
+    try {
+      await sendResetEmail(rawResetToken, user.email, user.username);
+    } catch (err) {
+      throw new InternalServer("Reset link failed");
+    }
+
+    await user.save();
+    res.status(200).json({
+      sucess: true,
+      message: "Reset link has been sent to your email",
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
   logoutUser,
   verifyEmail,
-  reGenEmailVerificationUrl,
+  resendVerificationEmail,
   refreshAccessToken,
+  requestPasswordReset,
 };

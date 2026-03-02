@@ -31,6 +31,7 @@ const userSchema = new mongoose.Schema(
     },
     verificationToken: String,
     passwordResetToken: String,
+    passwordResetExpires: { type: Date },
     role: {
       type: String,
       enum: ["user", "admin"],
