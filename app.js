@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
+const path = require("path");
 
 // #### --------- Importing Errors ---------- ####
 const errorHandler = require("./middleware/errorhandler.middleware");
@@ -9,6 +10,11 @@ const { NotFound } = require("./errors/Errors.error");
 
 // #### --------- Importing Routers --------- ####
 const userRouter = require("./routes/user.routes.js");
+
+// #### ------------ SSR -------------------- ####
+
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
 
 // #### ---------------- USE -----------------####
 app.use(cookieParser());
@@ -18,6 +24,7 @@ app.use(
     credentials: true,
   }),
 );
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use("/", userRouter);
