@@ -20,18 +20,18 @@ const {
 // ######### setting Routes ###########
 
 // core auth
-router.route("/api/auth/register").post(registerUser);
-router.route("/api/auth/login").post(loginUser);
-router.route("/api/auth/logout").post(logoutUser);
-router.route("/api/auth/refresh").post(refreshAccessToken);
+router.route("/register").post(registerUser);
+router.route("/login").post(loginUser);
+router.route("/logout").post(logoutUser);
+router.route("/refresh").post(refreshAccessToken);
 
 // email verification
-router.route("/api/auth/verify-email").get(verifyEmail);
-router.route("/api/auth/resend-verification").post(resendVerificationEmail);
+router.route("/verify-email").get(verifyEmail);
+router.route("/resend-verification").post(resendVerificationEmail);
 
 // password reset
-router.route("/api/auth/forget-password").post(requestPasswordReset);
-router.route("/api/auth/reset-password").get(renderResetPasswordForm);
-router.route("/api/auth/reset-password/:token").post(resetPassword);
+router.route("/forget-password").post(requestPasswordReset);
+router.route("/reset-password").get(renderResetPasswordForm);
+router.route("/reset-password/:token").post(resetPassword);
 
 module.exports = router;

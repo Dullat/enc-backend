@@ -10,6 +10,7 @@ const { NotFound } = require("./errors/Errors.error");
 
 // #### --------- Importing Routers --------- ####
 const userRouter = require("./routes/user.routes.js");
+const encRouter = require("./routes/enc.routes.js");
 
 // #### ------------ SSR -------------------- ####
 
@@ -27,7 +28,8 @@ app.use(
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-app.use("/", userRouter);
+app.use("/api/auth", userRouter);
+app.use("/", encRouter);
 
 // #### --------- Status and Errors ---------####
 app.get("/status", (req, res) => {
