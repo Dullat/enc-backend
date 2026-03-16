@@ -16,7 +16,7 @@ const refreshToken = new mongoose.Schema({
   },
   ip: {
     type: String,
-    require: [true, "IP is hidden"],
+    required: [true, "IP is hidden"],
   },
   createdAt: {
     type: Date,
