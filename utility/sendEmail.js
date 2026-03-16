@@ -19,7 +19,7 @@ const sendEmail = async ({ email, subject, html }) => {
   });
 };
 
-const sendVerifiactionEmail = async (verificationToken, email, username) => {
+const sendVerificationEmail = async (verificationToken, email, username) => {
   const verifyUrl = `http://localhost:5000/api/auth/verify-email?token=${verificationToken}&email=${email}`;
   await sendEmail({
     email: email,
@@ -41,4 +41,4 @@ const sendResetEmail = async (resetToken, email, username) => {
   });
 };
 
-module.exports = { sendVerifiactionEmail, sendResetEmail };
+module.exports = { sendVerificationEmail, sendResetEmail };
