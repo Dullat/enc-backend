@@ -1,6 +1,11 @@
+// womp womp, wasted time, its not gonna work , it only works in postman
+// the approach i used was full-duplex. but browsers are half duplex, so it causes tcp-deadLock
+// fetch wont let read incomming stream untill upload strean is 100% done
+// so , i have to drop this idea, i may use socket.io or webCrypto api insted
 const Busboy = require("busboy");
 const crypto = require("crypto");
 const path = require("path");
+const { PassThrough } = require("stream");
 
 const {
   BadRequest,
@@ -52,6 +57,7 @@ const encryptAndDownloadDirect = async (req, res, next) => {
       fileStream.pipe(cipher).pipe(res, { end: false });
 
       cipher.on("end", () => {
+        console.log("File encrypted succesfully");
         const authTag = cipher.getAuthTag();
         res.end(authTag);
       });

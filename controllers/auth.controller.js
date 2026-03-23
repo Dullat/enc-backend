@@ -11,6 +11,7 @@ const {
   Unauthorized,
   InternalServer,
   Forbidden,
+  NotFound,
 } = require("../errors/Errors.error.js");
 
 const crypto = require("crypto");
@@ -284,15 +285,7 @@ const verifyEmail = async (req, res, next) => {
 
     if (!user) throw new Unauthorized("Invalid or expired verification link");
 
-    res.status(200).json({
-      success: true,
-      message: "Email verified successfully",
-      user: {
-        name: user.name,
-        email: user.email,
-        isEmailVerified: user.isEmailVerified,
-      },
-    });
+    res.redirect("https://enc.dullat.in/login");
   } catch (err) {
     next(err);
   }

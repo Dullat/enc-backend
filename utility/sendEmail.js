@@ -4,7 +4,8 @@ const nodeMailer = require("nodemailer");
 const sendEmail = async ({ email, subject, html }) => {
   const transport = nodeMailer.createTransport({
     host: process.env.E_HOST,
-    port: process.env.E_PORT,
+    port: parseInt(process.env.E_PORT) || 587,
+    secure: false,
     auth: {
       user: process.env.E_USER,
       pass: process.env.E_PASS,
@@ -12,7 +13,7 @@ const sendEmail = async ({ email, subject, html }) => {
   });
 
   return transport.sendMail({
-    from: `"Enc-org Admin" <admin@email.com>`,
+    from: `"Enc" <noreply@mail-enc.dullat.in>`,
     to: email,
     subject: subject,
     html: html,
@@ -20,7 +21,7 @@ const sendEmail = async ({ email, subject, html }) => {
 };
 
 const sendVerificationEmail = async (verificationToken, email, username) => {
-  const verifyUrl = `http://localhost:5000/api/auth/verify-email?token=${verificationToken}&email=${email}`;
+  const verifyUrl = `http://enc-api.dullat.in/api/auth/verify-email?token=${verificationToken}&email=${email}`;
   await sendEmail({
     email: email,
     subject: `Verify your Enc Account`,
@@ -31,7 +32,7 @@ const sendVerificationEmail = async (verificationToken, email, username) => {
 };
 
 const sendResetEmail = async (resetToken, email, username) => {
-  const resetUrl = `http://localhost:5000/api/auth/reset-password?token=${resetToken}&email=${email}`;
+  const resetUrl = `http://enc-api.dullat.in/api/auth/reset-password?token=${resetToken}&email=${email}`;
   await sendEmail({
     email: email,
     subject: `Reset your Enc password`,
