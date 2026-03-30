@@ -11,10 +11,9 @@ const { NotFound } = require("./errors/Errors.error");
 
 // #### --------- Importing Routers --------- ####
 const userRouter = require("./routes/user.routes.js");
-// const encRouter = require("./routes/enc.routes.js");
+const chatRouter = require("./routes/chat.routes.js");
 
 // #### ------------ SSR -------------------- ####
-
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
@@ -32,7 +31,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use("/api/auth", userRouter);
-// app.use("/", encRouter);
+app.use("/api/chat", chatRouter);
 
 // #### --------- Status and Errors ---------####
 app.get("/status", (req, res) => {

@@ -103,7 +103,10 @@ const getMe = async (req, res, next) => {
         plan: user.plan,
         storageLimit: user.storageLimit,
         role: user.role,
-        pubKey: user.publicKey,
+        publicKey: user.publicKey,
+        encryptedPrivateKey: user.encryptedPrivateKey,
+        keySalt: user.keySalt,
+        keyIv: user.keyIv,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
         loginMethods,
@@ -171,10 +174,20 @@ const getSessions = async (req, res, next) => {
   }
 };
 
+const getAllUsers = async (req, res, next) => {
+  try {
+    const users = await userModel.find({}, "username email publicKey");
+    res.status(200).json({ success: true, users });
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports = {
   renderResetPasswordForm,
   resetPassword,
   getMe,
   updateUsername,
   getSessions,
+  getAllUsers,
 };

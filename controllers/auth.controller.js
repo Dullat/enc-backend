@@ -19,7 +19,15 @@ const jwt = require("jsonwebtoken");
 
 const registerUser = async (req, res, next) => {
   try {
-    const { username, email, password } = req.body;
+    const {
+      username,
+      email,
+      password,
+      publicKey,
+      keySalt,
+      encryptedPrivateKey,
+      keyIv,
+    } = req.body;
 
     let missingFields = [];
     if (!username) missingFields.push("username");
@@ -45,6 +53,10 @@ const registerUser = async (req, res, next) => {
       email,
       password,
       verificationToken: hashedVerificationToken,
+      publicKey,
+      encryptedPrivateKey,
+      keySalt,
+      keyIv,
     });
 
     try {
@@ -71,6 +83,10 @@ const registerUser = async (req, res, next) => {
         plan: user.plan,
         storageLimit: user.storageLimit,
         role: user.role,
+        publicKey: user.publicKey,
+        encryptedPrivateKey: user.encryptedPrivateKey,
+        keySalt: user.keySalt,
+        keyIv: user.keyIv,
       },
     });
   } catch (err) {
@@ -146,6 +162,10 @@ const loginUser = async (req, res, next) => {
         plan: user.plan,
         storageLimit: user.storageLimit,
         role: user.role,
+        publicKey: user.publicKey,
+        encryptedPrivateKey: user.encryptedPrivateKey,
+        keySalt: user.keySalt,
+        keyIv: user.keyIv,
       },
     });
   } catch (err) {
