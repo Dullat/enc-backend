@@ -54,6 +54,9 @@ const userSchema = new mongoose.Schema(
     publicKey: {
       type: String,
     },
+    encryptedPrivateKey: { type: String },
+    keySalt: { type: String },
+    keyIv: { type: String },
   },
   { timestamps: true },
 );
