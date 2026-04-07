@@ -25,7 +25,7 @@ const sendEmail = async ({ email, subject, html }) => {
 };
 
 const sendVerificationEmail = async (verificationToken, email, username) => {
-  const verifyUrl = `https://enc-api.dullat.in/api/auth/verify-email?token=${verificationToken}&email=${email}`;
+  const verifyUrl = `${process.env.CLIENT_URL}/api/auth/verify-email?token=${verificationToken}&email=${email}`;
 
   await sendEmail({
     email,
@@ -37,7 +37,7 @@ const sendVerificationEmail = async (verificationToken, email, username) => {
 };
 
 const sendResetEmail = async (resetToken, email, username) => {
-  const resetUrl = `https://enc-api.dullat.in/api/auth/reset-password?token=${resetToken}&email=${email}`;
+  const resetUrl = `${process.env.CLIENT_URL}/api/auth/reset-password?token=${resetToken}&email=${email}`;
 
   await sendEmail({
     email,

@@ -38,7 +38,14 @@ const renderResetPasswordForm = async (req, res, next) => {
 const resetPassword = async (req, res, next) => {
   try {
     const rawResetTokne = req.params.token;
-    const { password, confirmPassword } = req.body;
+    const {
+      password,
+      confirmPassword,
+      publicKey,
+      encryptedPrivateKey,
+      keySalt,
+      keyIv,
+    } = req.body;
 
     if (!rawResetTokne) throw new BadRequest("Expired");
     if (!password || !confirmPassword)
@@ -62,6 +69,10 @@ const resetPassword = async (req, res, next) => {
     user.password = password;
     user.passwordResetToken = undefined;
     user.passwordResetExpires = undefined;
+    user.publicKey = publicKey;
+    user.encryptedPrivateKey = encryptedPrivateKey;
+    user.keySalt = keySalt;
+    user.keyIv = keyIv;
 
     await user.save();
 
