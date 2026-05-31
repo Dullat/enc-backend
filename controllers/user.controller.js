@@ -78,7 +78,10 @@ const resetPassword = async (req, res, next) => {
 
     await refreshTokenModel.deleteMany({ userId: user._id });
 
-    res.render("reset-success");
+    console.log("reseted");
+
+    // res.render("reset-success");
+    res.send("<p>Reset successfull</p>");
   } catch (err) {
     next(err);
   }
